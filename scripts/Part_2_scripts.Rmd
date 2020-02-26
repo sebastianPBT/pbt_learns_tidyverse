@@ -24,7 +24,7 @@ In this tutotrial we are using the titanic passenger information. See [dataset d
 
 ```{r}
 # Import data
-passengers <- read.csv("../data/train.csv") 
+passengers <- read.csv("../data/train.csv")
 ```
 
 Lets understand this command a little more: 
@@ -40,7 +40,7 @@ So here you are telling R that create an object called `passengers` and add info
 **To see help on a function use the following command** 
 ```{r}
 #Check help for a certain function
-#?read.csv
+?read.csv
 ```
 
 
@@ -54,7 +54,7 @@ Here is a data import command for a tab separated file.
 #passengers <- read_tsv("file.tsv")
 
 #Another way
-# passengers <- read.delim("../data/file.txt", header = TRUE, check.names=F)
+# passengers <- read.delim("../data/file.txt", header = TRUE, check.names=F, sep="|")
 ```
 Try to see the functions associated with added options used in the alternative data import command.
 
@@ -106,7 +106,8 @@ The `filter` verb chooses only the observations that match the condition. See it
 ```{r message = FALSE}
 # Filter to get all "male" rows
 passengers %>% 
-  filter(Sex == "male")
+filter(Sex == "female") %>%
+  summary()
 ```
 **What do you see about the survival of male passenger?**
 **Note**: 
@@ -137,7 +138,7 @@ You can also `arrange` by decreasing Fare:
 
 ```{r message = FALSE}
 # Arrange by decreasing Fare
-passengers %>% 
+exportTable<-passengers %>% 
   arrange(desc(Fare))
 ```
 
@@ -147,7 +148,9 @@ Sometimes you may wish to create new variables. We know that the variable "Parch
 ```{r message = FALSE}
 # Create new column FamSize (size of family)
 passengers %>% 
-  mutate(FamSize = Parch + SibSp)
+  drop_na() %>%
+  mutate(FamSize = Parch + SibSp) %>%
+  arrange(desc(FamSize))
 ```
 
 **Note:**
