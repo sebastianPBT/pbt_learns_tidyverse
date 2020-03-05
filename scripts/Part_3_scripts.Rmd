@@ -78,7 +78,9 @@ Faceting is a way to produce multiple plots simultaneously:
 
 ```{r message = FALSE}
 # Scatter plot of Age vs Fare colored by Sex faceted by Survived
-
+ggplot(passengers1, aes(x = Age, y = Fare, color = Sex)) +
+  geom_point() +
+  facet_grid(~Survived)
 ```
 **What can you see here?** 
 
@@ -86,7 +88,8 @@ Now let's redo our bar plot of passenger "Sex" and this time fill our bars accor
 
 ```{r message = FALSE}
 # Plot barplot of passenger Sex & fill according to Survival
-
+ggplot(passengers1 %>%drop_na(), aes(x = Sex, fill = Survived)) +
+  geom_bar()
 ```
 
 **What can you see here?** 
@@ -97,7 +100,9 @@ Say now you want to modify the axis of the graph above
 
 ```{r}
 # Use scale_y_continuous to modify axis breaks
-
+ggplot(passengers1, aes(x = Sex, fill = Survived)) +
+  geom_bar() +
+  scale_y_continuous(breaks=seq(0,1000,50))
 ```
 What we have done there is changes the scale of the y axis.
 
@@ -109,7 +114,11 @@ We used `scale_y_continuous(breaks=seq(0,1000,50))` which essentially says break
  
 ```{r}
 # Change x and y labels of the plot
-
+ggplot(passengers1, aes(x = Sex, fill = Survived)) +
+  geom_bar() +
+  scale_y_continuous(breaks=seq(0,1000,50))+
+  xlab("Gender of Passengers")+
+  ylab("Number of Passengers")
 ```
  `xlab` and `ylab` can alter the column headings to more meaningful names. 
  
@@ -119,7 +128,12 @@ We used `scale_y_continuous(breaks=seq(0,1000,50))` which essentially says break
  
 ```{r}
 # Change to a theme which gives a clear background
-
+ggplot(passengers1, aes(x = Sex, fill = Survived)) +
+  geom_bar() +
+  scale_y_continuous(breaks=seq(0,1000,50))+
+  xlab("Gender of Passengers")+
+  ylab("Number of Passengers")+
+  theme_bw()
 ```
  
  **But the lines too are very annoying. Can we get rid of them??**
@@ -127,7 +141,12 @@ We used `scale_y_continuous(breaks=seq(0,1000,50))` which essentially says break
   
 ```{r}
 # Have a clear background for the graph with theme_classic
-
+ggplot(passengers1, aes(x = Sex, fill = Survived)) +
+  geom_bar() +
+  scale_y_continuous(breaks=seq(0,1000,50))+
+  xlab("Gender of Passengers")+
+  ylab("Number of Passengers")+
+  theme_classic()
 ```
 
 **Why are my bars floating can they sit on the x axis**
@@ -136,7 +155,12 @@ you asked and ggplot delivered!
 
 ```{r}
 #Make the bars touch the x axis
-
+ggplot(passengers1, aes(x = Sex, fill = Survived)) +
+  geom_bar() +
+  scale_y_continuous(breaks=seq(0,1000,50), expand = c (0,0))+
+  xlab("Gender of Passengers")+
+  ylab("Number of Passengers")+
+  theme_classic()
 ```
 **Identify what changed?**
 
@@ -146,7 +170,12 @@ Yes why not. Just because you asked nicely.
 
 ```{r}
 #Give a black border to the bars
-
+ggplot(passengers1, aes(x = Sex, fill = Survived)) +
+  geom_bar(color = "black") +
+  scale_y_continuous(breaks=seq(0,1000,50), expand = c (0,0))+
+  xlab("Gender of Passengers")+
+  ylab("Number of Passengers")+
+  theme_classic()
 ```
 
 ## These are not the only types of plots. Lets look at the cheatsheet and make some plots.
@@ -159,19 +188,24 @@ Now that you have created so many graphs its time to save them. Currently these 
 
 ```{r}
 #Save graph: Save to an R object
-
+plot<-ggplot(passengers1, aes(x = Sex, fill = Survived)) +
+  geom_bar(color = "black") +
+  scale_y_continuous(breaks=seq(0,1000,50), expand = c (0,0))+
+  xlab("Gender of Passengers")+
+  ylab("Number of Passengers")+
+  theme_classic()
 ```
 See what happens when you call this R object.
 ```{r}
 #Call the object plot 
-
+plot
 ```
 
 Now lets save the object plot.
 
 ```{r}
 #Saving the figure in object plot
-
+ggsave("../Output/betterplot.pdf", plot = plot,scale = 1, width = 10, height = 10, units = c("cm"), dpi = 600)
 ```
 
 
@@ -190,7 +224,7 @@ We will use the famous mtcars dataset for this which comes embedded in R and ass
 
 ```{r Look at the mtcars data set}
 mtcars # View the data frame directly
-dim(mtcars)# How big is this dataset?
+str(mtcars)# How big is this dataset?
 ```
 More about the data set can be read [here](https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/mtcars.html)
 
@@ -220,7 +254,7 @@ p4 <- ggplot(mtcars) + geom_bar(aes(carb))+ ggtitle("Plot 4")+theme_bw()
 1. Lets arrange plots p1 and p2 beside one another.
 
 ```{r Patchwork Example1: Two plots}
-
+p1+p2
 ```
 
 2. Arrange all four plots together
@@ -228,9 +262,8 @@ p4 <- ggplot(mtcars) + geom_bar(aes(carb))+ ggtitle("Plot 4")+theme_bw()
 Say you want 3 of the four plots in the top panel and one plot underneath all of these
 
 ```{r Patchwork Example2: Four plots together}
-
-
-
+(p4|p2)/
+  p3
 ```
 
 3. Including facetted plots
@@ -239,7 +272,12 @@ An interesting thing about ggplot is that it lets you make plots where you can u
 We will replace plot 4 with a facetted plot, with facetting happening with the variable `cyl` (number of cylinders in the car)
 
 ```{r facetted plot example}
-
+p4 <- ggplot(mtcars) +
+  geom_bar(aes(gear)) +
+  facet_grid(vs~cyl) +
+  ggtitle('Plot 4') +
+  theme_bw()
+p4
 ```
 **What do you see in the plot you just made from the graphing point of view?**
 
@@ -250,19 +288,22 @@ Lets you still want two plots together but the second one is a composite of othe
 In this case lets say plot `p1` is our primary plot and second section contains `p2+p3`. Can we make such an arrangement?
 
 ```{r Patchwork Ex4: Custom combination of plots }
-
+patch<- (p2/p3)
+p1+patch
 ```
 
 5. Adding non-ggplot content to graph
 
 ```{r Patchwork Ex5}
-
+p1 + grid::textGrob('I like graphs')
 ```
 
 6. Add a table instead
 
 ```{r Patchwork Ex6}
-
+install.packages('gridExtra')
+library(gridExtra)
+p1 + gridExtra::tableGrob(mtcars[1:10, c('mpg', 'disp')])
 ```
 
 7. Stacking alternatives
@@ -277,7 +318,7 @@ You can find many of these at this [patchwork vignette](https://patchwork.data-i
  - Beside one another
  
 ```{r Patchwork Ex7b}
-
+patch|p1
 ```
  
  - Now for 3 plots
@@ -293,7 +334,12 @@ Again many examples are available from this [patchwork vignette](https://patchwo
 - Adding common title to a `patchwork assembly`
 
 ```{r Add title to patchwork assembly}
-
+patchwork<- (p1|p2)/p3
+patchwork + plot_annotation(
+  title = 'Funny',
+  subtitle = 'Joke',
+  caption = 'Mouse'
+)
 ```
 
 - Tagging plots with A,B, ... 
@@ -301,7 +347,7 @@ Again many examples are available from this [patchwork vignette](https://patchwo
 This is often what you do in inkscape or other software. Now you can do it while plotting. 
 
 ```{r Tagging example}
-
+patchwork + plot_annotation(tag_levels = c('1','A'))
 ```
 
 - you may want to do it as 1A, 1B and so on. This is how it can be done. 
@@ -310,10 +356,11 @@ This is often what you do in inkscape or other software. Now you can do it while
 
 patchwork[[1]] <- patchwork[[1]] + plot_layout(tag_level = 'new')
 #Simple layout
-
+patchwork + plot_annotation(tag_levels = c('1','A'))
 
 #Something more complex
-
+patchwork + plot_annotation(tag_levels = c('1','A'), tag_prefix = 'Fig.',
+                            tag_sep = '.', tag_suffix = ':')
 ```
 
 Many more ways exist for manipulating how plots are arranged. do look at the vignettes.
@@ -323,7 +370,8 @@ Many more ways exist for manipulating how plots are arranged. do look at the vig
 Install cowplot. Cowplot fortuately is available on CRAN and installtion is simply one line of code. 
 
 ```{r Install and load cowplot}
-
+install.packages("cowplot")
+library(cowplot)
 ```
 
 Lets now work with the four plots we already have produced for patchwork
@@ -336,11 +384,14 @@ Note you could use `plot_grid` to create an R object.
 
 ```{r}
 # Specify labels
-
+plot_grid(p1, p2, p3, ncol = 2, nrow = 2, labels = c('a', 'b', 'c'))
 # Auto assign lables
-
+plot_grid(p1, p2, p3, labels = "AUTO")
 # Setting label characterisitics
-
+final_plot<- plot_grid(p1, p2, p3, labels = "AUTO", label_size = 20, label_fontface = 'italic')
+#Now Save!
+library(ggplot2)
+ggsave("../Output/final_plot.pdf", plot = final_plot,scale = 1, width = 10, height = 10, units = c("cm"), dpi = 600)
 ```
 
 Cowplot comes with its own wiki. You can access the wiki [here](https://wilkelab.org/cowplot/index.html)

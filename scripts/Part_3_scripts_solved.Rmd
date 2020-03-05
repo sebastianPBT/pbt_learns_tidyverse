@@ -80,6 +80,14 @@ Faceting is a way to produce multiple plots simultaneously:
 ggplot(passengers1, aes(x = Age, y = Fare, color = Sex)) +
   geom_point() +
   facet_grid(~Survived)
+
+#Change facet grid order in ggplot grapg
+passengers1$Survived_f = factor(passengers1$Survived, levels=c('Yes','No'))
+
+Testplot<-ggplot(passengers1 %>% drop_na(), aes (x = Age, y=Fare, color = Sex)) +
+  geom_point() +
+  facet_grid(.~Survived_f)
+str(Testplot)
 ```
 **What can you see here?** 
 
